@@ -6,6 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/reports")
 @CrossOrigin(origins = "*")
@@ -17,13 +19,29 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    @GetMapping("/basic")
-    public ResponseEntity<byte[]> getReport() {
+    @GetMapping("/full")
+    public ResponseEntity<byte[]> getFullReport() {
 
-        byte[] pdf = reportService.generateBasicReport();
+        byte[] pdf = reportService.generateFullReport();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte.pdf")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_accesos.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
+    @GetMapping("/date")
+    public ResponseEntity<byte[]> reportByDate(
+            @RequestParam String start,
+            @RequestParam String end) {
+
+        LocalDateTime startDate = LocalDateTime.parse(start);
+        LocalDateTime endDate = LocalDateTime.parse(end);
+
+        byte[] pdf = reportService.generateReportByDate(startDate, endDate);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_fecha.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
